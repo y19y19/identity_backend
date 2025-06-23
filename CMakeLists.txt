@@ -99,6 +99,8 @@ target_include_directories(
   triton-identity-backend
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    /cvmfs/cms.cern.ch/el8_amd64_gcc12/external/alpaka/1.2.0-b081818336b70095080b83065d50ff0d/include
+    /cvmfs/cms.cern.ch/el8_amd64_gcc12/external/boost/1.80.0-96a02191111b66819e07de179cb25a0e/include
 )
 
 target_compile_features(triton-identity-backend PRIVATE cxx_std_${TRITON_MIN_CXX_STANDARD})
@@ -112,9 +114,17 @@ target_compile_options(
 if(${TRITON_ENABLE_METRICS})
   target_compile_definitions(
     triton-identity-backend
-    PRIVATE TRITON_ENABLE_METRICS=1
+    PRIVATE 
+      TRITON_ENABLE_METRICS=1
   )
 endif() # TRITON_ENABLE_METRICS
+
+target_compile_definitions(
+  triton-identity-backend
+  PRIVATE
+    ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
+)
+
 
 target_link_libraries(
   triton-identity-backend
