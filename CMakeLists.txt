@@ -26,7 +26,7 @@
 
 cmake_minimum_required(VERSION 3.17)
 
-project(tritonidentitybackend LANGUAGES C CXX)
+project(tritonLSTbackend LANGUAGES C CXX)
 
 # Use C++17 standard as Triton's minimum required.
 set(TRITON_MIN_CXX_STANDARD 17 CACHE STRING "The minimum C++ standard which features are requested to build this target.")
@@ -37,7 +37,7 @@ set(TRITON_MIN_CXX_STANDARD 17 CACHE STRING "The minimum C++ standard which feat
 # Must include options required for this project as well as any
 # projects included in this one by FetchContent.
 #
-# GPU support is disabled by default because identity backend doesn't
+# GPU support is disabled by default because LST backend doesn't
 # support GPUs.
 #
 option(TRITON_ENABLE_GPU "Enable GPU support in backend" OFF)
@@ -84,26 +84,26 @@ FetchContent_MakeAvailable(repo-common repo-core repo-backend)
 #
 # Shared library implementing the Triton Backend API
 #
-configure_file(src/libtriton_identity.ldscript libtriton_identity.ldscript COPYONLY)
+configure_file(src/libtriton_LST.ldscript libtriton_LST.ldscript COPYONLY)
 
 add_library(
-  triton-identity-backend SHARED
-  src/identity.cc
+  triton-LST-backend SHARED
+  src/LST.cc
 )
 
 add_library(
-  TritonIdentityBackend::triton-identity-backend ALIAS triton-identity-backend
+  TritonLSTBackend::triton-LST-backend ALIAS triton-LST-backend
 )
 
 target_include_directories(
-  triton-identity-backend
+  triton-LST-backend
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_features(triton-identity-backend PRIVATE cxx_std_${TRITON_MIN_CXX_STANDARD})
+target_compile_features(triton-LST-backend PRIVATE cxx_std_${TRITON_MIN_CXX_STANDARD})
 target_compile_options(
-  triton-identity-backend PRIVATE
+  triton-LST-backend PRIVATE
   $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
     -Wall -Wextra -Wno-unused-parameter -Wno-type-limits -Werror>
   $<$<CXX_COMPILER_ID:MSVC>:/Wall /D_WIN32_WINNT=0x0A00 /EHsc>
@@ -111,13 +111,13 @@ target_compile_options(
 
 if(${TRITON_ENABLE_METRICS})
   target_compile_definitions(
-    triton-identity-backend
+    triton-LST-backend
     PRIVATE TRITON_ENABLE_METRICS=1
   )
 endif() # TRITON_ENABLE_METRICS
 
 target_link_libraries(
-  triton-identity-backend
+  triton-LST-backend
   PRIVATE
     triton-core-serverapi   # from repo-core
     triton-core-backendapi  # from repo-core
@@ -127,17 +127,17 @@ target_link_libraries(
 
 if(WIN32)
   set_target_properties(
-    triton-identity-backend PROPERTIES
+    triton-LST-backend PROPERTIES
     POSITION_INDEPENDENT_CODE ON
-    OUTPUT_NAME triton_identity
+    OUTPUT_NAME triton_LST
   )
 else()
   set_target_properties(
-    triton-identity-backend PROPERTIES
+    triton-LST-backend PROPERTIES
     POSITION_INDEPENDENT_CODE ON
-    OUTPUT_NAME triton_identity
-    LINK_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libtriton_identity.ldscript
-    LINK_FLAGS "-Wl,--version-script libtriton_identity.ldscript"
+    OUTPUT_NAME triton_LST
+    LINK_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libtriton_LST.ldscript
+    LINK_FLAGS "-Wl,--version-script libtriton_LST.ldscript"
   )
 endif()
 
@@ -145,38 +145,38 @@ endif()
 # Install
 #
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/TritonIdentityBackend)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/TritonLSTBackend)
 
 install(
   TARGETS
-    triton-identity-backend
+    triton-LST-backend
   EXPORT
-    triton-identity-backend-targets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/backends/identity
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/backends/identity
+    triton-LST-backend-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/backends/LST
+  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/backends/LST
 )
 
 install(
   EXPORT
-    triton-identity-backend-targets
+    triton-LST-backend-targets
   FILE
-    TritonIdentityBackendTargets.cmake
+    TritonLSTBackendTargets.cmake
   NAMESPACE
-    TritonIdentityBackend::
+    TritonLSTBackend::
   DESTINATION
     ${INSTALL_CONFIGDIR}
 )
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  ${CMAKE_CURRENT_LIST_DIR}/cmake/TritonIdentityBackendConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/TritonIdentityBackendConfig.cmake
+  ${CMAKE_CURRENT_LIST_DIR}/cmake/TritonLSTBackendConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/TritonLSTBackendConfig.cmake
   INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 install(
   FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/TritonIdentityBackendConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/TritonLSTBackendConfig.cmake
   DESTINATION ${INSTALL_CONFIGDIR}
 )
 
@@ -184,9 +184,9 @@ install(
 # Export from build tree
 #
 export(
-  EXPORT triton-identity-backend-targets
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/TritonIdentityBackendTargets.cmake
-  NAMESPACE TritonIdentityBackend::
+  EXPORT triton-LST-backend-targets
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/TritonLSTBackendTargets.cmake
+  NAMESPACE TritonLSTBackend::
 )
 
-export(PACKAGE TritonIdentityBackend)
+export(PACKAGE TritonLSTBackend)

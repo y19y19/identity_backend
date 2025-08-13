@@ -27,13 +27,13 @@
 include(CMakeFindDependencyMacro)
 
 get_filename_component(
-  TRITONIDENTITYBACKEND_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH
+  TRITONLSTBACKEND_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH
 )
 
-list(APPEND CMAKE_MODULE_PATH ${TRITONIDENTITYBACKEND_CMAKE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${TRITONLSTBACKEND_CMAKE_DIR})
 
-if(NOT TARGET TritonIdentityBackend::triton-identity-backend)
-  include("${TRITONIDENTITYBACKEND_CMAKE_DIR}/TritonIdentityBackendTargets.cmake")
+if(NOT TARGET TritonLSTBackend::triton-LST-backend)
+  include("${TRITONLSTBACKEND_CMAKE_DIR}/TritonLSTBackendTargets.cmake")
 endif()
 
-set(TRITONIDENTITYBACKEND_LIBRARIES TritonIdentityBackend::triton-identity-backend)
+set(TRITONLSTBACKEND_LIBRARIES TritonLSTBackend::triton-LST-backend)
